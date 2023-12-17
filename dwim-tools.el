@@ -133,14 +133,14 @@
   (interactive)
   (dwim-shell-command-on-marked-files
    "Merge videos: the videos being merged should be the same format or codec, otherwise the result may not be as expected."
-   (format "ffmpeg -f concat -safe 0 -i /tmp/mergedfilelist.txt -c copy '<<%s(u)>>'; rm -rf /tmp/mergedfilelist.txt"
+   (format "ffmpeg -f concat -safe 0 -i ./mergedfilelist.txt -c copy '<<%s(u)>>'; rm -rf ./mergedfilelist.txt"
            (dwim-shell-command-read-file-name
             "output file name (default \"output.mp4\"): "
             :extension "mp4"
             :default "output.mp4")
            (dwim-shell-command-on-marked-files
             "Make file list for merging"
-            (format "echo file '<<f>>' >> /tmp/mergedfilelist.txt"
+            (format "echo file '<<f>>' >> ./mergedfilelist.txt"
                     :extension "txt"
                     ))
            :utils "ffmpeg")
