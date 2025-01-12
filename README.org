@@ -6,4 +6,6 @@ Nevertheless, I am sharing these tools for people who have a similar working sty
 A small function for correcting or translating a selected text region.
 * dwim-tools.el
 My dwim-shell-commands functions
+* rxocrpdf
+A simple script to convert PDF files to text using Tesseract and ImageMagick.
 

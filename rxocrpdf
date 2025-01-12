@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Set default values
+DEFAULT_RESOLUTION=300
+DEFAULT_LANGUAGE=eng
+
+# Function to check and install required software
+check_and_install() {
+  if ! command -v "$1" &> /dev/null; then
+    echo "Error: $1 is not installed."
+    echo "Install using: sudo apt-get install $1"
+    exit 1
+  fi
+}
+
+check_and_install convert
+check_and_install tesseract
+
+
+# Function to handle potential errors and cleanup
+handle_error() {
+  rm -f "$OUTPUT_IMAGE_PREFIX"*.png 2>/dev/null
+  exit 1
+}
+
+# Help function
+help_message() {
+  echo "Usage: $0 [OPTIONS] <input_pdf> [output_txt]"
+  echo "  Options:"
+  echo "    -h, --help           Display this help message"
+  echo "    -r <resolution>      Specify resolution for conversion (default: $DEFAULT_RESOLUTION DPI)"
+  echo "    -l <language>        Specify OCR language (default: $DEFAULT_LANGUAGE)"
+  echo "    -p, --prompt         Ask user if overwrite existed output file"
+  exit 0
+}
+
+LANGUAGE="$DEFAULT_LANGUAGE"
+RESOLUTION="$DEFAULT_RESOLUTION"
+OVERWRITE=1
+# Parse options
+while getopts ":r:l:h:p" opt; do
+  case $opt in
+    r) RESOLUTION="$OPTARG";;
+    l) LANGUAGE="$OPTARG";;
+    h) help_message; exit 0;;
+    p) OVERWRITE=0;;
+    \?) echo "Invalid option: -$OPTARG"; handle_error;;
+  esac
+done
+
+shift $((OPTIND - 1))
+
+
+if [[ $# -lt 1 ]]; then
+  echo "Error: Please specify an input PDF file."
+  help_message
+fi
+
+INPUT_PDF="$1"
+shift
+
+OUTPUT_TEXT="output.txt"
+if [[ -n "$1" ]]; then
+    OUTPUT_TEXT="$1"
+fi
+
+if [ "$OVERWRITE" -eq 0 -a -f "$OUTPUT_TEXT" ]; then
+    echo "$OUTPUT_TEXT already exists, overwrite it? (yes/no): "
+    read answer
+    case "$answer" in
+        yes|yes)
+            rm "$OUTPUT_TEXT" 2>/dev/null
+            ;;
+        no|no)
+            exit 1
+            ;;
+    esac
+fi
+
+OUTPUT_IMAGE_PREFIX="${INPUT_PDF%.*}"
+
+if [ ! -f "$INPUT_PDF" ]; then
+  echo "Error: Input PDF file not found: $INPUT_PDF"
+  exit 1
+fi
+
+
+convert -density "$RESOLUTION" "$INPUT_PDF" "$OUTPUT_IMAGE_PREFIX"-%04d.png 2>/dev/null || handle_error
+
+for img in "$OUTPUT_IMAGE_PREFIX"*.png; do
+    OUTPUT_PAGE_TEXT="$img"
+    echo "converting new page.."
+    tesseract "$img" "$OUTPUT_PAGE_TEXT" -l "$LANGUAGE" 2>/dev/null || handle_error
+    echo "================" >> "$OUTPUT_TEXT"
+    echo "== Page $page ==" >> "$OUTPUT_TEXT"
+    echo "================" >> "$OUTPUT_TEXT"
+    cat "$OUTPUT_PAGE_TEXT".txt >> "$OUTPUT_TEXT"
+    rm -f "$OUTPUT_PAGE_TEXT".txt
+done
+
+
+rm -f "$OUTPUT_IMAGE_PREFIX"*.png 2>/dev/null
+
+echo "OCR completed successfully. Output in $OUTPUT_TEXT"

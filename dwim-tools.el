@@ -92,7 +92,7 @@
   (dwim-shell-command-on-marked-files
    "Resize PDF file to small size"
    (format "ps2pdf -dPDFSETTINGS=/screen -dDownsampleColorImages=true -dColorImageResolution=%d -dColorImageDownsampleType=/Bicubic '<<f>>' '<<%s(u)>>'"
-           (read-number "Image Resolution:(default:200): ")
+           (read-number "Image Resolution:(default:200): " 200)
            (dwim-shell-command-read-file-name
             "output file name (default \"resized.pdf\"): "
             :extension "pdf"
@@ -192,9 +192,38 @@
   (dwim-shell-command-on-marked-files
    "Covert images to pdf"
    (format "convert '<<f>>' -quality %s '<<%s(u)>>'"
-           (read-string "Quality (number like 100): ")
+           (read-string "Quality (number like 100): " "100")
            (dwim-shell-command-read-file-name
             "output file name (default \"merged.pdf\"): "
             :extension "pdf"
             :default "merged.pdf"))
    :utils "convert"))
+
+;; ;; OCR pdf file to text file
+;; ;; 
+;; This function uses the convert and tersercat commands to perform OCR on a PDF file, outputting the text to a file.
+;; Ensure that ImageMagick and tersercat are installed on your system.
+;; Additionally, download my "rxocrpdf" script from https://github.com/ruanxiang/emacs_conf
+;; Usage Instructions:
+;; 1. Select files in Dired.
+;; 2. Execute 'M-x my/dwim-shell-command-ocr-pdf-to-text-file'.
+;; 3. You will be prompted to enter the resolution, with a default of 300. This value is used by the convert command to convert the PDF into a PNG image, which is then processed by tersercat for OCR (as tersercat cannot handle PDF files directly).
+;; 4. Next, specify the OCR language, defaulting to 'eng' (English).
+;; 5. Finally, specify the output file name, which defaults to 'output.txt'.
+
+;; NOTE: This tool can process multiple files and compiles the results into a single output file, separating each page with "=== Page ===".
+(defun my/dwim-shell-command-ocr-pdf-to-text-file()
+  "OCR PDF file to a text file"
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "OCR PDF file to a text file"
+   (format "rxocrpdf -r %s -l %s '<<f>>' '<<%s(u)>>'"
+           (read-string "Resolution of conversion (default: 300): " "300")
+           (read-string "OCR Language (default: eng): " "eng")
+           (dwim-shell-command-read-file-name
+            "output file name (default \"output.txt\"): "
+            :extension "txt"
+            :default "output.txt")
+
+           )
+   :utils "rxocrpdf"))

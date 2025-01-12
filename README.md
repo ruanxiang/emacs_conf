@@ -1,12 +1,13 @@
 
 # Table of Contents
 
-1.  [Overview](#org1d20369)
-2.  [correct-or-translate-by-gpt.el](#org8adcfc4)
-3.  [dwim-tools.el](#orga2080ab)
+1.  [Overview](#org9343c5d)
+2.  [correct-or-translate-by-gpt.el](#org3c2c653)
+3.  [dwim-tools.el](#orge4badcd)
+4.  [rxocrpdf](#orge8cc43d)
 
 
-<a id="org1d20369"></a>
+<a id="org9343c5d"></a>
 
 # Overview
 
@@ -15,16 +16,23 @@ This repository includes some of my Lisp tools used in my everyday work. All the
 Nevertheless, I am sharing these tools for people who have a similar working style to mine. It is highly appreciated if you download the tools, and even more so if you provide feedback for any improvements.
 
 
-<a id="org8adcfc4"></a>
+<a id="org3c2c653"></a>
 
 # correct-or-translate-by-gpt.el
 
 A small function for correcting or translating a selected text region.
 
 
-<a id="orga2080ab"></a>
+<a id="orge4badcd"></a>
 
 # dwim-tools.el
 
 My dwim-shell-commands functions
+
+
+<a id="orge8cc43d"></a>
+
+# rxocrpdf
+
+A simple script to convert PDF files to text using Tesseract and ImageMagick.
 
