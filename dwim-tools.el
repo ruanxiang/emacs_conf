@@ -220,10 +220,11 @@
    (format "rxocrpdf -r %s -l %s '<<f>>' '<<%s(u)>>'"
            (read-string "Resolution of conversion (default: 300): " "300")
            (read-string "OCR Language (default: eng): " "eng")
-           (dwim-shell-command-read-file-name
-            "output file name (default \"output.txt\"): "
-            :extension "txt"
-            :default "output.txt")
-
+           (expand-file-name
+            (dwim-shell-command-read-file-name
+             "output file name (default \"output.txt\"): "
+             :extension "txt"
+             :default "output.txt")
+            )
            )
    :utils "rxocrpdf"))
